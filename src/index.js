@@ -1,72 +1,91 @@
-// import debounce from 'lodash.debounce';
-// import './css/styles.css';
-// import Notiflix from 'notiflix';
+import './css/styles.css';
+import Notiflix from 'notiflix';
 // import { fetchCountries } from './fetch';
+import axios from "axios";
 
-// const DEBOUNCE_DELAY = 300;
-// const refs = {
-// input: document.querySelector('#search-box'),
-// list: document.querySelector('.country-list'),
-// box: document.querySelector('.country-info'),
-// }
+const refs = {
+input: document.querySelector('input'),
+form: document.querySelector('.search-form'),
+buttonLoad: document.querySelector('.load-more'),
+gallery: document.querySelector('.gallery')
+}
+
+const BASE_URL = "https://pixabay.com/api/";
+
+refs.form.addEventListener('submit', (onFormSubmit));
+refs.input.addEventListener('input', () => {});
+
+let nameSearch = refs.input.value;
+ 
+
+async function fetchImages() {
+    try {
+        const response = await axios.get(`${BASE_URL}?key=29221253-dd17a46566e1be23f7ca8ff9b&image_type=photo&orientation=horizontal&safesearch=true&q=${nameSearch}`);
+        const arrayImages = await response.data.hits;
+
+        if(arrayImages === 0) {
+            Notiflix.Notify.warning(
+                "Sorry, there are no images matching your search query. Please try again.")
+        }
+        return arrayImages       
+        
+    } catch(error) {
+        console.log(error)
+    }
+}
+
+    
+function onFormSubmit(e) {    
+    e.preventDefault()
+nameSearch = refs.input.value;
+    if(nameSearch === "") {
+        cleanMarkup()
+        return
+    }
+   
+  fetchImages() 
+    .then(images => {
+      insertMarkup(images);
+    }).catch(error => (console.log(error)))
+  }
+
+  const createMarkup = img => `
+  <div class="photo-card">
+         <a href="${img.largeImageURL}">
+          <img class="gallery__image" src="${img.webformatURL}" alt="${img.tags}" loading="lazy" />
+          </a>
+        <div class="info">
+              <p class="info-item">
+                  <b>Likes<br>${img.likes}</b>
+              </p>
+              <p class="info-item">
+              <b>Views<br>${img.views}</b>
+              </p>
+              <p class="info-item">
+              <b>Comments<br>${img.comments}</b>
+              </p>
+              <p class="info-item">
+              <b>Downloads<br>${img.downloads}</b>
+              </p>
+        </div>
+    </div>
+        `;
 
 
-// const onInputSearch = (e) => {
-//     cleanMarkup()
-// const nameCountry = e.target.value.trim().toLowerCase();
-
-// if(nameCountry === "") {
-//     cleanMarkup()
-//     return;
-// }  
-//   fetchCountries(nameCountry)
-//   .then(countries => {
-//     insertMarkup(countries);
-//   }).catch(error => {if(error === "Error 404") {
-//     Notiflix.Notify.failure("Oops, there is no country with that name")
-//   }})
-// }
-
-// refs.input.addEventListener('input', debounce(onInputSearch, DEBOUNCE_DELAY));
-
-// const createMaxMarkup = item => `
-// <li>
-// <img src="${item.flags.svg}" width=70px>
-// <p> ${item.name.official}</p>
-// <p>Capital: ${item.capital}</p>
-// <p>Population: ${item.population}</p>
-// <p>Languages: ${Object.values(item.languages)}</p>
-// </li>
-// `;
-
-// const createMinMarkup = item => `
-// <li>
-// <img src="${item.flags.svg}" width=70px>
-// <p> ${item.name.official}</p>
-// </li>
-// `;
+  function insertMarkup(arrayImages) {
+    const result = generateMarkup(arrayImages);
+    refs.gallery.insertAdjacentHTML('beforeend', result);
+}
 
 
-// function generateMarkup(array) {
-//     if(array.length > 10) {
-//         Notiflix.Notify.warning(
-//         "Too many matches found. Please enter a more specific name.")} 
+  function generateMarkup(arrayImages) {
+      return arrayImages.reduce((acc, img) => acc + createMarkup(img), "") 
+    };
 
-//     else if(array.length >= 2 && array.length <= 10){            
-//         return array.reduce((acc, item) => acc + createMinMarkup(item), "")}
-
-//      else if(array.length === 1) {
-//         return array.reduce((acc, item) => acc + createMaxMarkup(item), "") 
-//     } 
-// }
+  
+  function cleanMarkup(){
+      refs.gallery.innerHTML = " ";
+  }
 
 
-// function insertMarkup(array) {
-//     const result = generateMarkup(array);
-//     refs.list.insertAdjacentHTML('beforeend', result);
-// }
-
-// function cleanMarkup(){
-//     refs.list.innerHTML = "";
-//     refs.box.innerHTML = "";
-// }
+onFormSubmit()
