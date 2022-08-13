@@ -1,6 +1,5 @@
 import './css/styles.css';
 import Notiflix from 'notiflix';
-// import { fetchCountries } from './fetch';
 import axios from "axios";
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
@@ -15,22 +14,26 @@ gallery: document.querySelector('.gallery'),
 const BASE_URL = "https://pixabay.com/api/";
 
 refs.form.addEventListener('submit', (onFormSubmit));
-refs.input.addEventListener('input', () => {});
+refs.buttonLoad.addEventListener('click', (onLoadMoreBtn))
+// refs.input.addEventListener('input', () => {});
 
 let nameSearch = refs.input.value;
-let lightbox = null;
- 
+let lightbox;
+let currentPage = 1;
+
+
 
 async function fetchImages() {
     try {
-        const response = await axios.get(`${BASE_URL}?key=29221253-dd17a46566e1be23f7ca8ff9b&image_type=photo&orientation=horizontal&safesearch=true&q=${nameSearch}`);
-        const arrayImages = await response.data.hits;
+        const response = await axios.get(`${BASE_URL}?key=29221253-dd17a46566e1be23f7ca8ff9b&image_type=photo&orientation=horizontal&safesearch=true&q=${nameSearch}&page=1&per_page=5`);
+         const arrayImages = await response.data.hits;
 
         if(arrayImages === 0) {
             Notiflix.Notify.warning(
                 "Sorry, there are no images matching your search query. Please try again.")
         }
-        return arrayImages       
+        return {arrayImages,
+            totalHits: response.data.totalHits,}       
         
     } catch(error) {
         console.log(error)
@@ -38,7 +41,7 @@ async function fetchImages() {
 }
 
 
-const createLightBox = () => {
+function createLightBox () {
     lightbox = new SimpleLightbox('.gallery a', {
         captionsData: 'alt',
         captionPosition: 'bottom',
@@ -46,27 +49,38 @@ const createLightBox = () => {
     });
 };
 
-
     
 function onFormSubmit(e) {    
     e.preventDefault()
+
+refs.gallery.innerHTML = '';
 nameSearch = refs.input.value;
-    if(nameSearch === "") {
-        cleanMarkup()
-        return
-    }
+nameSearch;
+
    
   fetchImages() 
+    .then(images => {
+      insertMarkup(images);
+      currentPage += 1;
+    }).catch(error => (console.log(error)))
+
+    createLightBox();
+    lightbox.on('')
+  }
+
+
+function onLoadMoreBtn(){
+    nameSearch = refs.input.value;
+    fetchImages() 
     .then(images => {
       insertMarkup(images);
     }).catch(error => (console.log(error)))
 
     createLightBox();
     lightbox.on('')
+}
 
-  }
-
-  const createMarkup = img => `
+const createMarkup = img => `
   <div class="photo-card">
          <a href="${img.largeImageURL} class="gallery_link">
           <img class="gallery__image" src="${img.webformatURL}" alt="${img.tags}" loading="lazy" />
@@ -86,24 +100,20 @@ nameSearch = refs.input.value;
               </p>
         </div>
     </div>
-        `;
+    `;
       
 
-  function insertMarkup(arrayImages) {
+function insertMarkup(arrayImages) {
     const result = generateMarkup(arrayImages);
     refs.gallery.insertAdjacentHTML('beforeend', result);
 }
 
 
-  function generateMarkup(arrayImages) {
-      return arrayImages.reduce((acc, img) => acc + createMarkup(img), "") 
-    };
-
-  
-  function cleanMarkup(){
-      refs.gallery.innerHTML = " ";
-  }
-
-
+function generateMarkup(  { arrayImages, totalHits }) {
+    if (currentPage === 1) {
+        Notiflix.Notify.success(`Hoooray! We found ${totalHits} images!`);
+          }
+    return arrayImages.reduce((acc, img) => acc + createMarkup(img), "") 
+};
 
 onFormSubmit()
