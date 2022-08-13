@@ -49,7 +49,7 @@ const createLightBox = () => {
 
     
 function onFormSubmit(e) {    
-    // e.preventDefault()
+    e.preventDefault()
 nameSearch = refs.input.value;
     if(nameSearch === "") {
         cleanMarkup()
