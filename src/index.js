@@ -22,13 +22,12 @@ let lightbox;
 let currentPage = 1;
 
 
-
 async function fetchImages() {
     try {
-        const response = await axios.get(`${BASE_URL}?key=29221253-dd17a46566e1be23f7ca8ff9b&image_type=photo&orientation=horizontal&safesearch=true&q=${nameSearch}&page=1&per_page=5`);
+        const response = await axios.get(`${BASE_URL}?key=29221253-dd17a46566e1be23f7ca8ff9b&image_type=photo&orientation=horizontal&safesearch=true&q=${nameSearch}&page=${currentPage}&per_page=100`);
          const arrayImages = await response.data.hits;
 
-        if(arrayImages === 0) {
+        if(arrayImages.length === 0) {
             Notiflix.Notify.warning(
                 "Sorry, there are no images matching your search query. Please try again.")
         }
@@ -51,17 +50,15 @@ function createLightBox () {
 
     
 function onFormSubmit(e) {    
-    e.preventDefault()
+e.preventDefault()
 
 refs.gallery.innerHTML = '';
 nameSearch = refs.input.value;
 nameSearch;
 
-   
   fetchImages() 
     .then(images => {
       insertMarkup(images);
-      currentPage += 1;
     }).catch(error => (console.log(error)))
 
     createLightBox();
@@ -74,6 +71,7 @@ function onLoadMoreBtn(){
     fetchImages() 
     .then(images => {
       insertMarkup(images);
+      currentPage += 1;
     }).catch(error => (console.log(error)))
 
     createLightBox();
@@ -87,7 +85,7 @@ const createMarkup = img => `
           </a>
         <div class="info">
               <p class="info-item">
-                  <b>Likes<br>${img.likes}</b>
+              <b>Likes<br>${img.likes}</b>
               </p>
               <p class="info-item">
               <b>Views<br>${img.views}</b>
@@ -100,7 +98,7 @@ const createMarkup = img => `
               </p>
         </div>
     </div>
-    `;
+`;
       
 
 function insertMarkup(arrayImages) {
