@@ -4,6 +4,7 @@ import axios from "axios";
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
+
 const refs = {
 input: document.querySelector('input'),
 form: document.querySelector('.search-form'),
@@ -15,16 +16,19 @@ const BASE_URL = "https://pixabay.com/api/";
 
 refs.form.addEventListener('submit', (onFormSubmit));
 refs.buttonLoad.addEventListener('click', (onLoadMoreBtn))
-// refs.input.addEventListener('input', () => {});
 
 let nameSearch = refs.input.value;
 let lightbox;
 let currentPage = 1;
+let perPage = 150;
+
+
+refs.buttonLoad.classList.add('invisible');
 
 
 async function fetchImages() {
     try {
-        const response = await axios.get(`${BASE_URL}?key=29221253-dd17a46566e1be23f7ca8ff9b&image_type=photo&orientation=horizontal&safesearch=true&q=${nameSearch}&page=${currentPage}&per_page=100`);
+        const response = await axios.get(`${BASE_URL}?key=29221253-dd17a46566e1be23f7ca8ff9b&image_type=photo&orientation=horizontal&safesearch=true&q=${nameSearch}&page=${currentPage}&per_page=${perPage}`);
          const arrayImages = await response.data.hits;
 
         if(arrayImages.length === 0) {
@@ -59,14 +63,17 @@ nameSearch;
   fetchImages() 
     .then(images => {
       insertMarkup(images);
+      currentPage += 1;
     }).catch(error => (console.log(error)))
 
     createLightBox();
+    refs.buttonLoad.classList.remove('invisible')
     lightbox.on('')
   }
 
 
 function onLoadMoreBtn(){
+
     nameSearch = refs.input.value;
     fetchImages() 
     .then(images => {
@@ -74,8 +81,7 @@ function onLoadMoreBtn(){
       currentPage += 1;
     }).catch(error => (console.log(error)))
 
-    createLightBox();
-    lightbox.on('')
+    lightbox.refresh();
 }
 
 const createMarkup = img => `
@@ -104,6 +110,13 @@ const createMarkup = img => `
 function insertMarkup(arrayImages) {
     const result = generateMarkup(arrayImages);
     refs.gallery.insertAdjacentHTML('beforeend', result);
+
+
+    // if (currentPage > Math.ceil(totalHits / perPage)) {
+    //     refs.buttonLoad.classList.add("invisible");
+    //     Notiflix.Notify.failure(
+    //         "We're sorry, but you've reached the end of search results.")
+    //   }
 }
 
 
@@ -112,6 +125,7 @@ function generateMarkup(  { arrayImages, totalHits }) {
         Notiflix.Notify.success(`Hoooray! We found ${totalHits} images!`);
           }
     return arrayImages.reduce((acc, img) => acc + createMarkup(img), "") 
+
 };
 
 onFormSubmit()
