@@ -48,13 +48,26 @@ async function fetchImages() {
 }
 
 
-function createLightBox () {
-    lightbox = new SimpleLightbox('.gallery a', {
-        captionsData: 'alt',
-        captionPosition: 'bottom',
-        captionDelay: 250,
-    });
-};
+// function createLightBox () {
+//     lightbox = new SimpleLightbox('.gallery a', {
+//         captionsData: 'alt',
+//         captionPosition: 'bottom',
+//         captionDelay: 250,
+//     });
+// };
+
+// console.log(createLightBox)
+
+
+
+    // lightbox = new SimpleLightbox('.gallery a', {
+    //     captionsData: 'alt',
+    //     captionPosition: 'bottom',
+    //     captionDelay: 250,
+    // });
+
+    console.log(lightbox)
+
 
     
 function onFormSubmit(e) {    
@@ -64,6 +77,7 @@ refs.gallery.innerHTML = '';
 nameSearch = refs.input.value;
 nameSearch;
 
+
   fetchImages() 
     .then(images => {
       insertMarkup(images);
@@ -71,8 +85,12 @@ nameSearch;
     }).catch(error => (console.log(error)))
 
     refs.buttonLoad.classList.remove('invisible')
-    createLightBox();
-    lightbox.on('')
+ 
+    lightbox = new SimpleLightbox('.gallery a', {
+        captionsData: 'alt',
+        captionPosition: 'bottom',
+        captionDelay: 250,
+    });
   }
 
 
@@ -90,13 +108,13 @@ function onLoadMoreBtn(){
       currentPage += 1;})
     .catch(error => (console.log(error)))
 
-    lightbox.refresh();
+    // lightbox.refresh();
 }
 
 
 const createMarkup = img => `
   <div class="photo-card">
-         <a href="${img.largeImageURL} class="gallery_link">
+         <a href="${img.largeImageURL}" class="gallery_link">
           <img class="gallery__image" src="${img.webformatURL}" alt="${img.tags}" width="370px" loading="lazy" />
           </a>
         <div class="info">
@@ -127,8 +145,9 @@ function generateMarkup(  { arrayImages, totalHits }) {
 
 function insertMarkup(arrayImages) {
     const result = generateMarkup(arrayImages);
-    lightbox.refresh();
+   
     refs.gallery.insertAdjacentHTML('beforeend', result);
+ lightbox.refresh();
 }
 
 
