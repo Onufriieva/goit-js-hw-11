@@ -10,6 +10,7 @@ input: document.querySelector('input'),
 form: document.querySelector('.search-form'),
 buttonLoad: document.querySelector('.load-more'),
 gallery: document.querySelector('.gallery'),
+alert: document.querySelector('.alert')
 }
 
 const BASE_URL = "https://pixabay.com/api/";
@@ -17,10 +18,13 @@ const BASE_URL = "https://pixabay.com/api/";
 refs.form.addEventListener('submit', (onFormSubmit));
 refs.buttonLoad.addEventListener('click', (onLoadMoreBtn))
 
+let isAlertVisible = false;
 let nameSearch = refs.input.value;
 let lightbox;
 let currentPage = 1;
-let perPage = 150;
+let perPage = 40;
+const totalPages = 500 / perPage;
+console.log(totalPages);
 
 
 refs.buttonLoad.classList.add('invisible');
@@ -66,28 +70,34 @@ nameSearch;
       currentPage += 1;
     }).catch(error => (console.log(error)))
 
-    createLightBox();
     refs.buttonLoad.classList.remove('invisible')
+    createLightBox();
     lightbox.on('')
   }
 
 
 function onLoadMoreBtn(){
+    if (currentPage > totalPages) {
+        refs.buttonLoad.classList.add('invisible');
+        return toggleAlertPopup()
+    }
 
     nameSearch = refs.input.value;
+
     fetchImages() 
     .then(images => {
-      insertMarkup(images);
-      currentPage += 1;
-    }).catch(error => (console.log(error)))
+      insertMarkup(images);   
+      currentPage += 1;})
+    .catch(error => (console.log(error)))
 
     lightbox.refresh();
 }
 
+
 const createMarkup = img => `
   <div class="photo-card">
          <a href="${img.largeImageURL} class="gallery_link">
-          <img class="gallery__image" src="${img.webformatURL}" alt="${img.tags}" loading="lazy" />
+          <img class="gallery__image" src="${img.webformatURL}" alt="${img.tags}" width="370px" loading="lazy" />
           </a>
         <div class="info">
               <p class="info-item">
@@ -107,25 +117,29 @@ const createMarkup = img => `
 `;
       
 
-function insertMarkup(arrayImages) {
-    const result = generateMarkup(arrayImages);
-    refs.gallery.insertAdjacentHTML('beforeend', result);
-
-
-    // if (currentPage > Math.ceil(totalHits / perPage)) {
-    //     refs.buttonLoad.classList.add("invisible");
-    //     Notiflix.Notify.failure(
-    //         "We're sorry, but you've reached the end of search results.")
-    //   }
-}
-
-
 function generateMarkup(  { arrayImages, totalHits }) {
     if (currentPage === 1) {
         Notiflix.Notify.success(`Hoooray! We found ${totalHits} images!`);
-          }
+    }
     return arrayImages.reduce((acc, img) => acc + createMarkup(img), "") 
-
 };
 
-onFormSubmit()
+
+function insertMarkup(arrayImages) {
+    const result = generateMarkup(arrayImages);
+    lightbox.refresh();
+    refs.gallery.insertAdjacentHTML('beforeend', result);
+}
+
+
+function toggleAlertPopup() {
+    if (isAlertVisible) {
+      return;
+    }
+    isAlertVisible = true;
+    refs.alert.classList.add("is-visible");
+    setTimeout(() => {
+      refs.alert.classList.remove("is-visible");
+      isAlertVisible = false;
+    }, 3000);
+  };

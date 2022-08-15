@@ -1,81 +1,22 @@
-// export function fetchCountries(name) {
-//   const BASE_URL = "https://restcountries.com/v3.1/"
-//   return fetch(
-//     `${BASE_URL}name/${name}?`
-//   )
-//     .then(response => {        
-//         if (response.status === 200) {            
-//             return response.json();
-//           }
-                
-//           if (response.status === 404) {
-//             return Promise.reject('Error 404');
-//           }     
-//     })    
-// } 
+// import axios from "axios";
 
 
+// export async function fetchImages() {
+//   const BASE_URL = "https://pixabay.com/api/";
+//   let currentPage = 1;
+//   let perPage = 40;
+//   try {
+//       const response = await axios.get(`${BASE_URL}?key=29221253-dd17a46566e1be23f7ca8ff9b&image_type=photo&orientation=horizontal&safesearch=true&q=${nameSearch}&page=${currentPage}&per_page=${perPage}`);
+//        const arrayImages = await response.data.hits;
 
-
-
-
-
-// / const onInputSearch = (e) => {
-  //     cleanMarkup()
-  // const nameCountry = e.target.value.trim().toLowerCase();
-  
-  // if(nameCountry === "") {
-  //     cleanMarkup()
-  //     return;
-  // }  
-  //   fetchCountries(nameCountry)
-  //   .then(countries => {
-  //     insertMarkup(countries);
-  //   }).catch(error => {if(error === "Error 404") {
-  //     Notiflix.Notify.failure("Oops, there is no country with that name")
-  //   }})
-  // }
-  
-  // refs.input.addEventListener('input', debounce(onInputSearch, DEBOUNCE_DELAY));
-  
-  // const createMaxMarkup = item => `
-  // <li>
-  // <img src="${item.flags.svg}" width=70px>
-  // <p> ${item.name.official}</p>
-  // <p>Capital: ${item.capital}</p>
-  // <p>Population: ${item.population}</p>
-  // <p>Languages: ${Object.values(item.languages)}</p>
-  // </li>
-  // `;
-  
-  // const createMinMarkup = item => `
-  // <li>
-  // <img src="${item.flags.svg}" width=70px>
-  // <p> ${item.name.official}</p>
-  // </li>
-  // `;
-  
-  
-  // function generateMarkup(array) {
-  //     if(array.length > 10) {
-  //         Notiflix.Notify.warning(
-  //         "Too many matches found. Please enter a more specific name.")} 
-  
-  //     else if(array.length >= 2 && array.length <= 10){            
-  //         return array.reduce((acc, item) => acc + createMinMarkup(item), "")}
-  
-  //      else if(array.length === 1) {
-  //         return array.reduce((acc, item) => acc + createMaxMarkup(item), "") 
-  //     } 
-  // }
-  
-  
-  // function insertMarkup(array) {
-  //     const result = generateMarkup(array);
-  //     refs.list.insertAdjacentHTML('beforeend', result);
-  // }
-  
-  // function cleanMarkup(){
-  //     refs.list.innerHTML = "";
-  //     refs.box.innerHTML = "";
-  // }
+//       if(arrayImages.length === 0) {
+//           Notiflix.Notify.warning(
+//               "Sorry, there are no images matching your search query. Please try again.")
+//       }
+//       return {arrayImages,
+//           totalHits: response.data.totalHits,}       
+      
+//   } catch(error) {
+//       console.log(error)
+//   }
+// }
