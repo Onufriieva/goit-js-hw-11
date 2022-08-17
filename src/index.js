@@ -37,7 +37,9 @@ async function fetchImages() {
 
         if(arrayImages.length === 0) {
             Notiflix.Notify.warning(
-                "Sorry, there are no images matching your search query. Please try again.")
+            "Sorry, there are no images matching your search query. Please try again.")
+        } else if(arrayImages.length !== 0) {
+            refs.buttonLoad.classList.remove('invisible')
         }
         return {arrayImages,
             totalHits: response.data.totalHits,}       
@@ -47,36 +49,14 @@ async function fetchImages() {
     }
 }
 
-
-// function createLightBox () {
-//     lightbox = new SimpleLightbox('.gallery a', {
-//         captionsData: 'alt',
-//         captionPosition: 'bottom',
-//         captionDelay: 250,
-//     });
-// };
-
-// console.log(createLightBox)
-
-
-
-    // lightbox = new SimpleLightbox('.gallery a', {
-    //     captionsData: 'alt',
-    //     captionPosition: 'bottom',
-    //     captionDelay: 250,
-    // });
-
-    console.log(lightbox)
-
-
     
 function onFormSubmit(e) {    
 e.preventDefault()
 
-refs.gallery.innerHTML = '';
-nameSearch = refs.input.value;
-nameSearch;
-
+  refs.gallery.innerHTML = '';
+  nameSearch = refs.input.value;
+  nameSearch;
+  refs.buttonLoad.classList.add('invisible')
 
   fetchImages() 
     .then(images => {
@@ -84,14 +64,13 @@ nameSearch;
       currentPage += 1;
     }).catch(error => (console.log(error)))
 
-    refs.buttonLoad.classList.remove('invisible')
  
     lightbox = new SimpleLightbox('.gallery a', {
         captionsData: 'alt',
         captionPosition: 'bottom',
         captionDelay: 250,
     });
-  }
+}
 
 
 function onLoadMoreBtn(){
@@ -107,8 +86,6 @@ function onLoadMoreBtn(){
       insertMarkup(images);   
       currentPage += 1;})
     .catch(error => (console.log(error)))
-
-    // lightbox.refresh();
 }
 
 
@@ -132,8 +109,8 @@ const createMarkup = img => `
               </p>
         </div>
     </div>
-`;
-      
+`; 
+
 
 function generateMarkup(  { arrayImages, totalHits }) {
     if (currentPage === 1) {
@@ -144,11 +121,11 @@ function generateMarkup(  { arrayImages, totalHits }) {
 
 
 function insertMarkup(arrayImages) {
-    const result = generateMarkup(arrayImages);
-   
+    const result = generateMarkup(arrayImages);   
     refs.gallery.insertAdjacentHTML('beforeend', result);
+
  lightbox.refresh();
-}
+};
 
 
 function toggleAlertPopup() {
@@ -161,4 +138,4 @@ function toggleAlertPopup() {
       refs.alert.classList.remove("is-visible");
       isAlertVisible = false;
     }, 3000);
-  };
+};
